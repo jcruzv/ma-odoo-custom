@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_custom" model="ir.ui.view">
+        <field name="name">sale.order.form.custom</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Botón Generar Cita -->
+            <xpath expr="//header" position="inside">
+                <button name="action_generate_appointment" string="Generar Cita" type="object" class="oe_highlight" invisible="state not in ['draft', 'sent'] or appointment_status != 'Pendiente'"/>
+            </xpath>
+            
+            <!-- Campos en el Header -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="sender_partner_id"/>
+                <xpath expr="//field[@name='client_order_ref']" position="move"/>
+            </xpath>
+
+            <!-- Columnas en Líneas de Pedido -->
+            <xpath expr="//field[@name='order_line']//field[@name='name']" position="after">
+                <field name="included_product_ids" widget="many2many_tags" optional="show"/>
+            </xpath>
+
+            <!-- Nuevas Pestañas -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Productos Prestados" name="loaned_products">
+                    <field name="loaned_product_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="product_template_id"/>
+                            <field name="name"/>
+                            <field name="quantity"/>
+                            <field name="warehouse_id"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+                
+            <xpath expr="//notebook" position="before">
+                <group name="appointment_info" string="INFORMACIÓN DE LA CITA">
+                    <group>
+                        <field name="appointment_duration" widget="float_time"/>
+                        <field name="availability_start"/>
+                        <field name="availability_end"/>
+                    </group>
+                    <group>
+                        <field name="appointment_status" readonly="1"/>
+                        <field name="appointment_url" widget="url" readonly="1"/>
+                        <field name="quote_link" widget="url" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Texto Términos" name="terms_conditions">
+                    <xpath expr="//field[@name='note']" position="move"/>
+                </page>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Texto Portada" name="cover_text">
+                    <field name="cover_text" widget="html"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
