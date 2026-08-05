@@ -115,15 +115,6 @@ class SaleOrder(models.Model):
                                 
         return res
 
-    def _action_confirm(self):
-        """El core solo genera proyecto para líneas de servicio; aquí se cubren
-        los bienes marcados con ma_generate_project."""
-        res = super()._action_confirm()
-        if not self.env.context.get('disable_project_task_generation'):
-            for order in self:
-                order.order_line.sudo().with_company(order.company_id)._ma_generate_projects()
-        return res
-
     def _get_ma_custom_prefix(self, area, service_type):
         mapping = {
             'operaciones': {

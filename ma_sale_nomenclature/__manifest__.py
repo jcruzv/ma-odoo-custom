@@ -1,12 +1,19 @@
 {
     'name': 'MA Sale Order Nomenclature',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Sales',
-    'summary': 'Custom nomenclature for Sales Orders based on product categories',
+    'summary': 'Nomenclatura de órdenes de venta y generación de proyectos',
     'description': """
-        Este módulo personaliza la estructura del nombre (folio) de las órdenes de venta.
+        Personaliza la estructura del nombre (folio) de las órdenes de venta.
         Estructura: PREFIJO-MES/AÑO-CLIENTE-FOLIO
         Ejemplo: O-EV-0626-123456-1234
+
+        Además ajusta la generación de proyectos al confirmar la orden:
+        - cada línea de servicio genera su propio proyecto, aunque varias líneas
+          apunten a la misma plantilla;
+        - todos los bienes de la orden comparten un único proyecto;
+        - los bienes pueden usar "Crear en la orden" / "Plantilla de proyecto",
+          que Odoo reserva a los servicios.
     """,
     'author': 'MA',
     'depends': ['sale_management', 'project', 'sale_project'],
