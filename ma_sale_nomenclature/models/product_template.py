@@ -16,17 +16,26 @@ class ProductTemplate(models.Model):
                 product.service_tracking = product.service_tracking or 'no'
 
     def write(self, vals):
-        # sale_project.write() resetea service_tracking y project_id cuando el
-        # tipo pasa a no-servicio; se restaura lo que estaba configurado.
+        # sale_project.write() fuerza service_tracking='no' y project_id=False
+        # cuando el tipo pasa a no-servicio. No se puede evitar, pero sí
+        # deshacer: primero se limpia la plantilla (con tracking 'no' la
+        # constraint _check_project_and_template la prohíbe) y al final se
+        # restaura todo junto, en un estado ya coherente.
         keep = {}
         if vals.get('type') and vals['type'] != 'service' and 'service_tracking' not in vals:
             for product in self:
                 if product.service_tracking == 'no':
                     continue
-                restore = {'service_tracking': product.service_tracking}
-                if product.service_tracking == 'task_global_project':
-                    restore['project_id'] = product.project_id.id
-                keep[product.id] = restore
+                keep[product.id] = {
+                    'service_tracking': product.service_tracking,
+                    'project_id': product.project_id.id,
+                    'project_template_id': product.project_template_id.id,
+                }
+            if keep:
+                super(ProductTemplate, self.browse(list(keep))).write({
+                    'project_id': False,
+                    'project_template_id': False,
+                })
         res = super().write(vals)
         for product_id, restore in keep.items():
             super(ProductTemplate, self.browse(product_id)).write(restore)
