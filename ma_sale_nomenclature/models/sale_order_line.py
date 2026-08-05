@@ -55,29 +55,25 @@ class SaleOrderLine(models.Model):
         account = order.project_account_id or self.env['account.analytic.account'].create(
             order._prepare_analytic_account_data()
         )
+        # sale_line_id NO se puede ligar con una línea de bien: sale_timesheet
+        # (project._check_sale_line_type) y sale_project (project.task) exigen
+        # línea de servicio. El vínculo con la venta queda por
+        # reinvoiced_sale_order_id en el proyecto, sale_order_id en las tareas y
+        # project_id en la línea. Por lo mismo el proyecto no es facturable.
         values = {
             'name': self._ma_project_name(template),
             'account_id': account.id,
             'partner_id': order.partner_id.id,
-            'sale_line_id': self.id,
             'company_id': self.company_id.id,
             'active': True,
-            'allow_billable': True,
+            'allow_billable': False,
         }
         if template:
             if template.is_template:
                 project = template.action_create_from_template(values)
             else:
                 project = template.copy(values)
-            project.tasks.write({
-                'sale_line_id': self.id,
-                'partner_id': order.partner_id.id,
-            })
-            # copiar un proyecto no propaga la OV a las subtareas
-            project.tasks.filtered('parent_id').write({
-                'sale_line_id': self.id,
-                'sale_order_id': order.id,
-            })
+            project.tasks.write({'partner_id': order.partner_id.id})
         else:
             project = self.env['project.project'].create(values)
 
@@ -109,11 +105,26 @@ class SaleOrderLine(models.Model):
             return '%s - [%s] %s' % (name, product.default_code, product.name)
         return '%s - %s' % (name, product.name)
 
+    def _ma_clean_task_vals(self, values):
+        """Quita de los valores de tarea lo que Odoo prohíbe en líneas de bien."""
+        values.pop('sale_line_id', None)
+        # sale_order_id se recomputa a False sin sale_line_id + allow_billable
+        values.pop('sale_order_id', None)
+        return values
+
     def _timesheet_create_task_prepare_values(self, project):
         values = super()._timesheet_create_task_prepare_values(project)
-        # horas asignadas = cantidad vendida no tiene sentido en un bien
+        if not self.is_service and self.product_id.ma_generate_project:
+            # horas asignadas = cantidad vendida no tiene sentido en un bien
+            values['allocated_hours'] = 0.0
+            self._ma_clean_task_vals(values)
+        return values
+
+    def _prepare_task_template_vals(self, template, project):
+        values = super()._prepare_task_template_vals(template, project)
         if not self.is_service and self.product_id.ma_generate_project:
             values['allocated_hours'] = 0.0
+            self._ma_clean_task_vals(values)
         return values
 
     @api.model_create_multi
