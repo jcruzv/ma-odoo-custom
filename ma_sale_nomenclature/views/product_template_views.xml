@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_template_form_inherit_ma_project" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.ma.project</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='general_information']" position="inside">
+                <group string="Proyecto MA" name="ma_project" invisible="type == 'service'">
+                    <field name="ma_generate_project"/>
+                    <field name="ma_project_template_id"
+                           invisible="not ma_generate_project"
+                           context="{'active_test': False, 'default_is_template': True, 'default_allow_billable': True}"
+                           placeholder="Proyecto en blanco"/>
+                    <field name="ma_generate_task" invisible="not ma_generate_project"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

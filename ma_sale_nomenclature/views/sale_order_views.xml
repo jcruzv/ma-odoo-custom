@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_ma_nomenclature" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.ma.nomenclature</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregamos los campos de categorización debajo del campo 'partner_id' -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="ma_category_area" widget="selection"/>
+                <field name="ma_category_type_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="ma_type_ev" model="ma.category.type">
+            <field name="name">Extintores - Venta</field>
+            <field name="code">EV</field>
+        </record>
+        <record id="ma_type_er" model="ma.category.type">
+            <field name="name">Extintores - Recarga</field>
+            <field name="code">ER</field>
+        </record>
+        <record id="ma_type_em" model="ma.category.type">
+            <field name="name">Extintores - Mantenimiento</field>
+            <field name="code">EM</field>
+        </record>
+        <record id="ma_type_i" model="ma.category.type">
+            <field name="name">Instalaciones</field>
+            <field name="code">I</field>
+        </record>
+        <record id="ma_type_p" model="ma.category.type">
+            <field name="name">PIPC</field>
+            <field name="code">P</field>
+        </record>
+        <record id="ma_type_c" model="ma.category.type">
+            <field name="name">Capacitación</field>
+            <field name="code">C</field>
+        </record>
+        <record id="ma_type_g" model="ma.category.type">
+            <field name="name">Gestiones</field>
+            <field name="code">G</field>
+        </record>
+        <record id="ma_type_impl" model="ma.category.type">
+            <field name="name">Implementación</field>
+            <field name="code">I</field>
+        </record>
+        <record id="ma_type_e" model="ma.category.type">
+            <field name="name">Estudios</field>
+            <field name="code">E</field>
+        </record>
+        <record id="ma_type_d" model="ma.category.type">
+            <field name="name">Dictamen</field>
+            <field name="code">D</field>
+        </record>
+    </data>
+</odoo>
