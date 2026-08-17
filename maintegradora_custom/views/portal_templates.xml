@@ -20,14 +20,8 @@
                 </t>
             </td>
             <td class="text-center">
-                <span t-attf-class="badge rounded-pill #{ {
-                          'on_track': 'text-bg-success',
-                          'at_risk': 'text-bg-warning',
-                          'off_track': 'text-bg-danger',
-                          'on_hold': 'text-bg-secondary',
-                          'done': 'text-bg-primary',
-                      }.get(project.last_update_status, 'text-bg-light border') }"
-                      t-field="project.last_update_status"/>
+                <t t-set="ma_status_class" t-value="{'on_track': 'text-bg-success', 'at_risk': 'text-bg-warning', 'off_track': 'text-bg-danger', 'on_hold': 'text-bg-secondary', 'done': 'text-bg-primary'}.get(project.last_update_status, 'text-bg-light border')"/>
+                <span t-att-class="'badge rounded-pill ' + ma_status_class" t-field="project.last_update_status"/>
             </td>
         </xpath>
     </template>
