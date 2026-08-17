@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Compartir proyectos: el core deja "Personas asignadas" (user_ids) de solo
+         lectura para el portal y su dominio exige usuarios internos, así que los
+         colaboradores asignan por empleado. -->
+    <record id="project_sharing_task_form_ma_employees" model="ir.ui.view">
+        <field name="name">project.sharing.task.form.ma.employees</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.project_sharing_project_task_view_form"/>
+        <field name="arch" type="xml">
+            <field name="portal_user_names" position="after">
+                <field name="employee_ids"
+                       string="Empleados asignados"
+                       widget="many2many_tags"
+                       options="{'no_create': True, 'no_open': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="project_sharing_task_list_ma_employees" model="ir.ui.view">
+        <field name="name">project.sharing.task.list.ma.employees</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.project_sharing_project_task_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="portal_user_names" position="after">
+                <field name="employee_ids"
+                       string="Empleados asignados"
+                       widget="many2many_tags"
+                       optional="show"/>
+            </field>
+        </field>
+    </record>
+</odoo>

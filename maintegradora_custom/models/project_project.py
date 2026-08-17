@@ -12,6 +12,8 @@ class ProjectProject(models.Model):
 
     def _sync_employee_collaborators(self):
         """Comparte el proyecto (modo Editar) con el partner de cada empleado asignado."""
+        # también se dispara desde el portal, que no tiene permisos aquí
+        self = self.sudo()
         Collaborator = self.env['project.collaborator']
         for project in self:
             partners = project.employee_ids.mapped(

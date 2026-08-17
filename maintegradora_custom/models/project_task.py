@@ -10,8 +10,21 @@ class ProjectTask(models.Model):
         string='Empleados asignados',
     )
 
+    @property
+    def TASK_PORTAL_READABLE_FIELDS(self):
+        return super().TASK_PORTAL_READABLE_FIELDS | {'employee_ids'}
+
+    @property
+    def TASK_PORTAL_WRITABLE_FIELDS(self):
+        # el core no deja escribir user_ids desde el portal (y su dominio exige
+        # usuarios internos); los colaboradores asignan por empleado
+        return super().TASK_PORTAL_WRITABLE_FIELDS | {'employee_ids'}
+
     def _sync_employee_collaborators(self):
         """Comparte el proyecto de la tarea (modo Editar) con el partner de cada empleado asignado."""
+        # los colaboradores del portal también asignan empleados y no tienen
+        # permisos sobre project.collaborator ni sobre el proyecto
+        self = self.sudo()
         Collaborator = self.env['project.collaborator']
         for task in self:
             project = task.project_id

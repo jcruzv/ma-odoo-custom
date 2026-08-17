@@ -6,10 +6,13 @@
     'author': 'Antigravity',
     'depends': ['sale_management', 'stock', 'mail', 'appointment', 'project', 'hr', 'sale_project'],
     'data': [
+        'security/ma_portal_security.xml',
         'security/ir.model.access.csv',
         'views/sale_order_views.xml',
         'views/product_template_views.xml',
         'views/project_views.xml',
+        'views/project_sharing_views.xml',
+        'views/portal_templates.xml',
     ],
     'installable': True,
     'application': False,

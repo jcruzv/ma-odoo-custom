@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_sale_loaned_product,sale.loaned.product,model_sale_loaned_product,base.group_user,1,1,1,1
+access_hr_employee_portal_assign,hr.employee.portal.assign,hr.model_hr_employee,maintegradora_custom.group_portal_assign_employees,1,0,0,0
