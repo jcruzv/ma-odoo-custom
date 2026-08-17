@@ -27,13 +27,9 @@ class MaPurchaseRequestPortal(CustomerPortal):
     def _ma_portal_employee(self):
         """Empleado activo detrás del usuario del portal (o recordset vacío)."""
         user = request.env.user
-        if not user.has_group('maintegradora_custom.group_portal_purchase_request'):
+        if not user.ma_can_request_rfq():
             return request.env['hr.employee']
-        return request.env['hr.employee'].sudo().search([
-            '|',
-            ('user_id', '=', user.id),
-            ('work_contact_id', '=', user.partner_id.id),
-        ], limit=1)
+        return user.ma_employee()
 
     def _ma_check_rfq_access(self):
         employee = self._ma_portal_employee()
@@ -45,12 +41,14 @@ class MaPurchaseRequestPortal(CustomerPortal):
         return [('create_uid', '=', request.env.user.id), ('ma_portal_request', '=', True)]
 
     def _prepare_home_portal_values(self, counters):
+        # OJO: /my/counters devuelve este diccionario tal cual y el JS del portal
+        # busca en el DOM un elemento por CADA clave; una clave de más deja el
+        # spinner girando para siempre. Solo se añade lo que se pidió.
         values = super()._prepare_home_portal_values(counters)
-        values['ma_can_request_rfq'] = bool(self._ma_portal_employee())
         if 'ma_rfq_count' in counters:
             values['ma_rfq_count'] = request.env['purchase.order'].sudo().search_count(
                 self._ma_rfq_domain()
-            ) if values['ma_can_request_rfq'] else 0
+            ) if self._ma_portal_employee() else 0
         return values
 
     @route(['/my/rfqs', '/my/rfqs/page/<int:page>'], type='http', auth='user', website=True)

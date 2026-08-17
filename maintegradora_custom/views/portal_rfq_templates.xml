@@ -3,7 +3,7 @@
     <!-- Tarjeta en Mi cuenta, solo para empleados con el grupo -->
     <template id="portal_my_home_ma_rfq" name="Solicitudes de compra" inherit_id="portal.portal_my_home" priority="30">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-if="ma_can_request_rfq" t-call="portal.portal_docs_entry">
+            <t t-if="request.env.user.ma_can_request_rfq()" t-call="portal.portal_docs_entry">
                 <t t-set="icon" t-value="'/web/static/img/rfq.svg'"/>
                 <t t-set="title">Solicitudes de compra</t>
                 <t t-set="text">Pida cotizaciones a proveedores</t>
