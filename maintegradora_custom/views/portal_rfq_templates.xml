@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tarjeta en Mi cuenta, solo para empleados con el grupo -->
+    <template id="portal_my_home_ma_rfq" name="Solicitudes de compra" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-if="ma_can_request_rfq" t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/web/static/img/rfq.svg'"/>
+                <t t-set="title">Solicitudes de compra</t>
+                <t t-set="text">Pida cotizaciones a proveedores</t>
+                <t t-set="url" t-value="'/my/rfqs'"/>
+                <t t-set="placeholder_count" t-value="'ma_rfq_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_menu_ma_rfq" name="Portal layout: solicitudes de compra" inherit_id="portal.portal_breadcrumbs" priority="30">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'ma_rfq'" class="breadcrumb-item active">
+                <a href="/my/rfqs">Solicitudes de compra</a>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- Lista -->
+    <template id="portal_my_rfqs" name="Mis solicitudes de compra">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Solicitudes de compra</t>
+            </t>
+            <div class="mb-3">
+                <a href="/my/rfqs/new" class="btn btn-primary">Nueva solicitud</a>
+            </div>
+            <t t-if="not orders">
+                <div class="alert alert-info" role="alert">Todavía no ha solicitado ninguna cotización.</div>
+            </t>
+            <t t-if="orders" t-call="portal.portal_table">
+                <thead>
+                    <tr>
+                        <th>Referencia</th>
+                        <th>Proveedor</th>
+                        <th>Fecha</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="orders" t-as="order">
+                        <td t-out="order.name"/>
+                        <td t-out="order.partner_id.name"/>
+                        <td t-field="order.create_date" t-options="{'widget': 'date'}"/>
+                        <td class="text-center">
+                            <t t-set="ma_rfq_class" t-value="{'draft': 'text-bg-secondary', 'sent': 'text-bg-info', 'purchase': 'text-bg-success', 'done': 'text-bg-success', 'cancel': 'text-bg-danger'}.get(order.state, 'text-bg-light border')"/>
+                            <span t-att-class="'badge rounded-pill ' + ma_rfq_class" t-field="order.state"/>
+                        </td>
+                        <td class="text-end" t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <!-- Formulario -->
+    <template id="portal_rfq_form" name="Nueva solicitud de compra">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <h3 class="mb-3">Nueva solicitud de compra</h3>
+            <div t-if="error == 'vendor'" class="alert alert-danger" role="alert">Seleccione un proveedor válido.</div>
+            <div t-if="error == 'lines'" class="alert alert-danger" role="alert">Agregue al menos un producto con cantidad mayor a cero.</div>
+            <form action="/my/rfqs/new" method="post" class="o_portal_details">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="partner_id">Proveedor</label>
+                        <select name="partner_id" id="partner_id" class="form-select" required="required">
+                            <option value="">Seleccione…</option>
+                            <option t-foreach="vendors" t-as="vendor" t-att-value="vendor.id" t-out="vendor.display_name"/>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="note">Nota para compras</label>
+                        <input type="text" name="note" id="note" class="form-control" placeholder="Opcional: obra, urgencia, referencia…"/>
+                    </div>
+                </div>
+
+                <table class="table mt-4" id="ma_rfq_lines">
+                    <thead>
+                        <tr>
+                            <th style="width: 45%">Producto</th>
+                            <th>Descripción</th>
+                            <th style="width: 15%">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="[0, 1, 2]" t-as="row" class="ma_rfq_line">
+                            <td>
+                                <select name="product_id" class="form-select">
+                                    <option value="">—</option>
+                                    <option t-foreach="products" t-as="product" t-att-value="product.id" t-out="product.display_name"/>
+                                </select>
+                            </td>
+                            <td><input type="text" name="description" class="form-control"/></td>
+                            <td><input type="number" name="product_qty" class="form-control" min="0" step="0.01" value="0"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-link ps-0" id="ma_rfq_add_line">+ Agregar línea</button>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+                    <a href="/my/rfqs" class="btn btn-link">Cancelar</a>
+                </div>
+            </form>
+            <script type="text/javascript">
+                document.getElementById('ma_rfq_add_line').addEventListener('click', function () {
+                    var table = document.querySelector('#ma_rfq_lines tbody');
+                    var row = table.querySelector('.ma_rfq_line').cloneNode(true);
+                    row.querySelectorAll('input').forEach(function (input) {
+                        input.value = input.type === 'number' ? '0' : '';
+                    });
+                    row.querySelector('select').selectedIndex = 0;
+                    table.appendChild(row);
+                });
+            </script>
+        </t>
+    </template>
+</odoo>

@@ -8,6 +8,12 @@
         <field name="comment">Deja que un colaborador del portal vea la lista de empleados y los asigne en las tareas de los proyectos compartidos con él. Darlo solo al personal de MA, no a los clientes.</field>
     </record>
 
+    <record id="group_portal_purchase_request" model="res.groups">
+        <field name="name">Portal: solicitar compras</field>
+        <field name="share" eval="True"/>
+        <field name="comment">Deja que un empleado con acceso al portal cree solicitudes de cotización a proveedores. Además del grupo, el usuario debe estar ligado a un empleado activo.</field>
+    </record>
+
     <record id="hr_employee_rule_portal_assign" model="ir.rule">
         <field name="name">Empleados visibles para colaboradores del portal</field>
         <field name="model_id" ref="hr.model_hr_employee"/>

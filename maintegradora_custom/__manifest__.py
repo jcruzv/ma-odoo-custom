@@ -4,7 +4,7 @@
     'category': 'Customizations',
     'summary': 'Custom logic and fields replacing Odoo Studio',
     'author': 'Antigravity',
-    'depends': ['sale_management', 'stock', 'mail', 'appointment', 'project', 'hr', 'sale_project'],
+    'depends': ['sale_management', 'stock', 'mail', 'appointment', 'project', 'hr', 'sale_project', 'purchase'],
     'data': [
         'security/ma_portal_security.xml',
         'security/ir.model.access.csv',
@@ -13,6 +13,7 @@
         'views/project_views.xml',
         'views/project_sharing_views.xml',
         'views/portal_templates.xml',
+        'views/portal_rfq_templates.xml',
     ],
     'installable': True,
     'application': False,
