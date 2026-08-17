@@ -51,12 +51,14 @@
                     <tr t-foreach="orders" t-as="order">
                         <td t-out="order.name"/>
                         <td t-out="order.partner_id.name"/>
-                        <td t-field="order.create_date" t-options="{'widget': 'date'}"/>
+                        <td><span t-field="order.create_date" t-options="{'widget': 'date'}"/></td>
                         <td class="text-center">
                             <t t-set="ma_rfq_class" t-value="{'draft': 'text-bg-secondary', 'sent': 'text-bg-info', 'purchase': 'text-bg-success', 'done': 'text-bg-success', 'cancel': 'text-bg-danger'}.get(order.state, 'text-bg-light border')"/>
                             <span t-att-class="'badge rounded-pill ' + ma_rfq_class" t-field="order.state"/>
                         </td>
-                        <td class="text-end" t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                        <td class="text-end">
+                            <span t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                        </td>
                     </tr>
                 </tbody>
             </t>
