@@ -2,7 +2,9 @@
 <odoo>
     <record id="group_portal_assign_employees" model="res.groups">
         <field name="name">Portal: asignar empleados</field>
-        <field name="category_id" ref="base.module_category_hidden"/>
+        <!-- v19: res.groups ya no tiene category_id, y share=True lo marca como
+             grupo de compartición para poder dárselo a usuarios del portal -->
+        <field name="share" eval="True"/>
         <field name="comment">Deja que un colaborador del portal vea la lista de empleados y los asigne en las tareas de los proyectos compartidos con él. Darlo solo al personal de MA, no a los clientes.</field>
     </record>
 
