@@ -80,8 +80,12 @@ class MaPurchaseRequestPortal(CustomerPortal):
         values = self._prepare_portal_layout_values()
         values.update({
             'page_name': 'ma_rfq',
+            # aún no hay proveedores dados de alta (supplier_rank = 0 en toda la
+            # base), así que se ofrecen también las empresas; solo lo ven
+            # empleados, no clientes
             'vendors': request.env['res.partner'].sudo().search(
-                [('supplier_rank', '>', 0)], order='name', limit=500),
+                ['|', ('supplier_rank', '>', 0), ('is_company', '=', True)],
+                order='supplier_rank desc, name', limit=500),
             'products': request.env['product.product'].sudo().search(
                 [('purchase_ok', '=', True)], order='name', limit=1000),
             'error': kw.get('error'),
@@ -95,7 +99,7 @@ class MaPurchaseRequestPortal(CustomerPortal):
         Product = request.env['product.product'].sudo()
 
         vendor = Partner.browse(int(post.get('partner_id') or 0)).exists()
-        if not vendor or vendor.supplier_rank <= 0:
+        if not vendor or not (vendor.supplier_rank > 0 or vendor.is_company):
             return request.redirect('/my/rfqs/new?error=vendor')
 
         lines = []

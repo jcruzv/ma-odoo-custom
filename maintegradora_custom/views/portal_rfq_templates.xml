@@ -67,6 +67,9 @@
             <h3 class="mb-3">Nueva solicitud de compra</h3>
             <div t-if="error == 'vendor'" class="alert alert-danger" role="alert">Seleccione un proveedor válido.</div>
             <div t-if="error == 'lines'" class="alert alert-danger" role="alert">Agregue al menos un producto con cantidad mayor a cero.</div>
+            <div t-if="not vendors" class="alert alert-warning" role="alert">
+                No hay proveedores dados de alta. Pida a compras que registre el contacto como proveedor.
+            </div>
             <form action="/my/rfqs/new" method="post" class="o_portal_details">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                 <div class="row g-3">
