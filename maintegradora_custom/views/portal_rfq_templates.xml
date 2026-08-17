@@ -9,6 +9,9 @@
                 <t t-set="text">Pida cotizaciones a proveedores</t>
                 <t t-set="url" t-value="'/my/rfqs'"/>
                 <t t-set="placeholder_count" t-value="'ma_rfq_count'"/>
+                <!-- sin esto la tarjeta nace con d-none y solo se muestra si el
+                     contador es != 0: nunca se vería para crear la primera -->
+                <t t-set="config_card" t-value="True"/>
             </t>
         </xpath>
     </template>
