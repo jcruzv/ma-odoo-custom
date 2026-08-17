@@ -30,13 +30,38 @@ class SaleOrder(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
-        
+
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         for order in records:
             order._portal_ensure_token()
             order.quote_link = f"{base_url}{order.access_url}?access_token={order.access_token}"
-            
+
         return records
+
+    def _action_confirm(self):
+        res = super()._action_confirm()
+        self._ma_generate_projects_from_templates()
+        return res
+
+    def _ma_generate_projects_from_templates(self):
+        """Permite que CUALQUIER producto (bien, servicio o combo) con
+        project_template_id cree el proyecto desde la plantilla al confirmar.
+        El nativo (sale_project) solo lo hace para servicios con service_tracking;
+        aqui cubrimos los demas. 1 proyecto por orden, sin duplicar."""
+        NATIVE_TRACKING = ('project_only', 'task_in_project', 'task_global_project')
+        for order in self:
+            if order.project_id:
+                continue  # ya hay proyecto (nativo por servicio, o previo)
+            for line in order.order_line:
+                product = line.product_id.product_tmpl_id
+                if not product.project_template_id or line.project_id:
+                    continue
+                # el nativo ya maneja servicios con rastreo -> no duplicar
+                if line.is_service and product.service_tracking in NATIVE_TRACKING:
+                    continue
+                project = line._timesheet_create_project()
+                order.project_id = project
+                break
 
     def action_generate_appointment(self):
         self.ensure_one()
